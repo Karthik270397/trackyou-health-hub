@@ -1,6 +1,6 @@
 
 import { useState } from "react";
-import { Plus, TrendingUp, Target, Moon, Utensils, Scale, Users, Watch, Bell, Download } from "lucide-react";
+import { Plus, TrendingUp, Target, Moon, Utensils, Scale, Users, Watch, Bell, Download, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
@@ -12,40 +12,61 @@ import CommunityChallenge from "@/components/CommunityChallenge";
 import SmartwatchSync from "@/components/SmartwatchSync";
 import DataExport from "@/components/DataExport";
 import NotificationCenter from "@/components/NotificationCenter";
+import QuickLogModal from "@/components/QuickLogModal";
+import PeriodSelector from "@/components/PeriodSelector";
 import { useToast } from "@/hooks/use-toast";
+import { useHealthData } from "@/hooks/useHealthData";
+import { useAuth } from "@/contexts/AuthContext";
 
 const Index = () => {
   const [activeTab, setActiveTab] = useState("dashboard");
+  const [period, setPeriod] = useState("week");
+  const [quickLogOpen, setQuickLogOpen] = useState(false);
   const { toast } = useToast();
+  const { data: healthData, loading } = useHealthData(period);
+  const { user, signOut } = useAuth();
 
   const mockData = {
-    currentWeight: 72.5,
+    currentWeight: healthData.weight[healthData.weight.length - 1] || 72.5,
     targetWeight: 70.0,
-    caloriesConsumed: 1450,
+    caloriesConsumed: healthData.calories[healthData.calories.length - 1] || 1450,
     caloriesTarget: 2000,
-    sleepHours: 7.5,
+    sleepHours: healthData.sleep[healthData.sleep.length - 1] || 7.5,
     sleepTarget: 8,
-    waterIntake: 6,
+    waterIntake: healthData.water[healthData.water.length - 1] || 6,
     waterTarget: 8,
-    stepCount: 8500,
+    stepCount: healthData.steps[healthData.steps.length - 1] || 8500,
     stepTarget: 10000
   };
 
-  const progressPercentage = ((mockData.targetWeight - mockData.currentWeight) / (mockData.targetWeight - 75)) * 100;
-
   const handleQuickLog = () => {
-    toast({
-      title: "Quick Log",
-      description: "Feature coming soon! You'll be able to quickly log meals, weight, and activities.",
-    });
+    setQuickLogOpen(true);
+  };
+
+  const handleSignOut = async () => {
+    try {
+      await signOut();
+      toast({ title: "Signed out successfully!" });
+    } catch (error) {
+      toast({ title: "Error signing out", variant: "destructive" });
+    }
   };
 
   const renderDashboard = () => (
     <div className="space-y-6 animate-fade-in">
       {/* Header */}
-      <div className="text-center space-y-2">
-        <h1 className="text-3xl font-bold gradient-text">Welcome back!</h1>
-        <p className="text-muted-foreground">Let's continue your health journey</p>
+      <div className="flex justify-between items-center">
+        <div className="text-center space-y-2">
+          <h1 className="text-3xl font-bold gradient-text">Welcome back, {user?.email?.split('@')[0]}!</h1>
+          <p className="text-muted-foreground">Let's continue your health journey</p>
+        </div>
+        <div className="flex items-center gap-4">
+          <PeriodSelector value={period} onValueChange={setPeriod} />
+          <Button variant="outline" onClick={handleSignOut}>
+            <LogOut className="h-4 w-4 mr-2" />
+            Sign Out
+          </Button>
+        </div>
       </div>
 
       {/* Quick Stats */}
@@ -88,7 +109,7 @@ const Index = () => {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Target className="h-5 w-5" />
-            Today's Progress
+            Today's Progress ({period})
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -127,6 +148,17 @@ const Index = () => {
       </Card>
     </div>
   );
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-green-50 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Loading your health data...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-green-50 dark:from-gray-900 dark:to-gray-800">
@@ -172,11 +204,17 @@ const Index = () => {
         {/* Floating Action Button */}
         <Button
           onClick={handleQuickLog}
-          className="floating-action w-16 h-16"
+          className="fixed bottom-6 right-6 w-16 h-16 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 z-50"
           size="lg"
         >
           <Plus className="h-6 w-6" />
         </Button>
+
+        {/* Quick Log Modal */}
+        <QuickLogModal 
+          open={quickLogOpen} 
+          onOpenChange={setQuickLogOpen} 
+        />
       </div>
     </div>
   );
