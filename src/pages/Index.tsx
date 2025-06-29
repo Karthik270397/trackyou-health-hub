@@ -1,6 +1,6 @@
 
 import { useState } from "react";
-import { Plus, TrendingUp, Target, Moon, Utensils, Scale } from "lucide-react";
+import { Plus, TrendingUp, Target, Moon, Utensils, Scale, Users, Watch, Bell, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
@@ -8,6 +8,10 @@ import WeightTracker from "@/components/WeightTracker";
 import MealLogger from "@/components/MealLogger";
 import SleepTracker from "@/components/SleepTracker";
 import GoalSetting from "@/components/GoalSetting";
+import CommunityChallenge from "@/components/CommunityChallenge";
+import SmartwatchSync from "@/components/SmartwatchSync";
+import DataExport from "@/components/DataExport";
+import NotificationCenter from "@/components/NotificationCenter";
 import { useToast } from "@/hooks/use-toast";
 
 const Index = () => {
@@ -134,7 +138,11 @@ const Index = () => {
             { id: "weight", label: "Weight", icon: Scale },
             { id: "meals", label: "Meals", icon: Utensils },
             { id: "sleep", label: "Sleep", icon: Moon },
-            { id: "goals", label: "Goals", icon: Target }
+            { id: "goals", label: "Goals", icon: Target },
+            { id: "community", label: "Community", icon: Users },
+            { id: "sync", label: "Sync", icon: Watch },
+            { id: "notifications", label: "Alerts", icon: Bell },
+            { id: "export", label: "Data", icon: Download }
           ].map((tab) => (
             <Button
               key={tab.id}
@@ -155,6 +163,10 @@ const Index = () => {
           {activeTab === "meals" && <MealLogger />}
           {activeTab === "sleep" && <SleepTracker />}
           {activeTab === "goals" && <GoalSetting />}
+          {activeTab === "community" && <CommunityChallenge />}
+          {activeTab === "sync" && <SmartwatchSync />}
+          {activeTab === "notifications" && <NotificationCenter />}
+          {activeTab === "export" && <DataExport />}
         </div>
 
         {/* Floating Action Button */}
