@@ -1,0 +1,170 @@
+
+# TrackYou Health Hub - Setup and Deployment Guide
+
+## Prerequisites
+- Node.js 18+ installed
+- Android Studio (for Android development)
+- Xcode (for iOS development - Mac only)
+- Git
+- Supabase account
+
+## 1. Initial Setup
+
+### Environment Variables
+Create a `.env.local` file in your project root with:
+```
+VITE_SUPABASE_URL=your_supabase_project_url
+VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
+```
+
+### Install Dependencies
+```bash
+npm install
+```
+
+### Initialize Capacitor (for mobile)
+```bash
+npx cap init
+```
+
+## 2. Supabase Setup
+
+1. Go to your Supabase dashboard
+2. Create a new project or use existing
+3. Go to SQL Editor and run the provided database-schema.sql
+4. Go to Authentication > Settings > Auth Providers
+5. Enable Google OAuth (optional)
+6. Copy your project URL and anon key to .env.local
+
+## 3. Web Development
+
+### Run Development Server
+```bash
+npm run dev
+```
+
+### Build for Production
+```bash
+npm run build
+```
+
+### Deploy Web App
+```bash
+npm run build
+# Upload dist/ folder to your web hosting service
+```
+
+## 4. Mobile Development
+
+### Add Mobile Platforms
+```bash
+# Add iOS (Mac only)
+npx cap add ios
+
+# Add Android
+npx cap add android
+```
+
+### Sync Web Code to Mobile
+```bash
+npm run build
+npx cap sync
+```
+
+### Run on Mobile
+
+#### Android
+```bash
+npx cap run android
+```
+Or open in Android Studio:
+```bash
+npx cap open android
+```
+
+#### iOS (Mac only)
+```bash
+npx cap run ios
+```
+Or open in Xcode:
+```bash
+npx cap open ios
+```
+
+## 5. Building for Production
+
+### Android APK/AAB
+1. Open project in Android Studio: `npx cap open android`
+2. Build > Generate Signed Bundle/APK
+3. Follow the signing process
+4. Upload to Google Play Console
+
+### iOS App Store
+1. Open project in Xcode: `npx cap open ios`
+2. Archive the project
+3. Upload to App Store Connect via Organizer
+
+## 6. Environment Configuration
+
+### Production Environment Variables
+For production, set these in your hosting platform:
+- VITE_SUPABASE_URL
+- VITE_SUPABASE_ANON_KEY
+
+### Mobile Environment
+Mobile apps will use the same environment variables built into the web bundle.
+
+## 7. Features Checklist
+
+✅ Authentication (Email/Password, Google OAuth)
+✅ Weight tracking with charts
+✅ Meal logging with calories
+✅ Sleep tracking
+✅ Goal setting and progress
+✅ Community challenges
+✅ Smartwatch sync simulation
+✅ Data export
+✅ Push notifications setup
+✅ Responsive design
+✅ Dark/Light mode
+✅ Period-based data filtering
+✅ Quick logging modal
+✅ Real-time data updates
+
+## 8. Troubleshooting
+
+### Common Issues:
+1. **Build fails**: Check Node.js version (18+)
+2. **Supabase connection fails**: Verify environment variables
+3. **Mobile app crashes**: Run `npx cap sync` after changes
+4. **Google OAuth not working**: Configure OAuth in Supabase dashboard
+
+### Development Tips:
+- Always run `npx cap sync` after making web changes
+- Use Chrome DevTools for mobile debugging
+- Check Supabase logs for database issues
+- Test on real devices for best results
+
+## 9. Deployment Checklist
+
+### Before Deployment:
+- [ ] Test all authentication flows
+- [ ] Verify database connections
+- [ ] Test on multiple devices
+- [ ] Check responsive design
+- [ ] Validate data persistence
+- [ ] Test offline functionality
+- [ ] Configure push notifications
+- [ ] Set up proper error handling
+- [ ] Add privacy policy and terms
+- [ ] Configure app store metadata
+
+### Post-Deployment:
+- [ ] Monitor error logs
+- [ ] Track user analytics
+- [ ] Test backup and recovery
+- [ ] Monitor performance
+- [ ] Gather user feedback
+
+## Contact
+For support, refer to the Lovable documentation or contact support.
