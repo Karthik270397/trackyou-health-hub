@@ -1,212 +1,121 @@
 
-import { useState } from "react";
-import { Download, FileText, Database, Calendar, Settings, Trash2 } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Switch } from "@/components/ui/switch";
-import { useToast } from "@/hooks/use-toast";
+import React from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Download, FileText, FileSpreadsheet, Calendar } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
 
 const DataExport = () => {
   const { toast } = useToast();
-  const [autoBackup, setAutoBackup] = useState(true);
-  const [notificationsEnabled, setNotificationsEnabled] = useState(true);
-  const [darkMode, setDarkMode] = useState(false);
+
+  const handleExport = (format: string, period: string) => {
+    toast({ 
+      title: `Exporting data...`, 
+      description: `Your ${period} data will be exported as ${format}` 
+    });
+  };
 
   const exportOptions = [
     {
-      type: "PDF Report",
+      format: 'CSV',
+      icon: FileSpreadsheet,
+      description: 'Comma-separated values for spreadsheet applications'
+    },
+    {
+      format: 'PDF',
       icon: FileText,
-      description: "Complete health report with charts and insights",
-      size: "2.5 MB",
-      format: "PDF"
+      description: 'Formatted report for easy reading and sharing'
     },
     {
-      type: "JSON Data",
-      icon: Database,
-      description: "Raw data export for backup or migration",
-      size: "1.2 MB",
-      format: "JSON"
-    },
-    {
-      type: "CSV Spreadsheet",
-      icon: Calendar,
-      description: "Tabular data for analysis in Excel/Sheets",
-      size: "800 KB",
-      format: "CSV"
+      format: 'JSON',
+      icon: FileText,
+      description: 'Raw data in JSON format for developers'
     }
   ];
 
-  const dataUsage = {
-    totalEntries: 1247,
-    weightLogs: 89,
-    mealLogs: 456,
-    sleepLogs: 78,
-    goalEntries: 34,
-    storageUsed: "4.2 MB",
-    lastBackup: "Yesterday at 3:45 PM"
-  };
-
-  const handleExport = (type: string) => {
-    toast({
-      title: "Export Started",
-      description: `Preparing your ${type} export...`,
-    });
-
-    setTimeout(() => {
-      toast({
-        title: "Export Complete!",
-        description: `Your ${type} has been downloaded successfully.`,
-      });
-    }, 2000);
-  };
-
-  const handleClearData = () => {
-    toast({
-      title: "Clear Data",
-      description: "This action cannot be undone. Are you sure?",
-      variant: "destructive",
-    });
-  };
-
-  const handleCloudBackup = () => {
-    toast({
-      title: "Cloud Backup",
-      description: "Your data has been backed up to the cloud securely.",
-    });
-  };
+  const timePeriods = [
+    { label: 'Last 7 days', value: 'week' },
+    { label: 'Last 30 days', value: 'month' },
+    { label: 'Last 3 months', value: 'quarter' },
+    { label: 'All time', value: 'all' }
+  ];
 
   return (
-    <div className="space-y-6 animate-fade-in">
-      <div className="text-center space-y-2">
-        <h2 className="text-2xl font-bold gradient-text">Data & Settings</h2>
-        <p className="text-muted-foreground">Manage your data and app preferences</p>
-      </div>
-
-      {/* Data Usage Overview */}
-      <Card className="health-card">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Database className="h-5 w-5" />
-            Data Usage
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <div className="text-center">
-              <p className="text-2xl font-bold text-health-blue">{dataUsage.totalEntries}</p>
-              <p className="text-sm text-muted-foreground">Total Entries</p>
-            </div>
-            <div className="text-center">
-              <p className="text-2xl font-bold text-health-green">{dataUsage.weightLogs}</p>
-              <p className="text-sm text-muted-foreground">Weight Logs</p>
-            </div>
-            <div className="text-center">
-              <p className="text-2xl font-bold text-health-orange">{dataUsage.mealLogs}</p>
-              <p className="text-sm text-muted-foreground">Meal Logs</p>
-            </div>
-            <div className="text-center">
-              <p className="text-2xl font-bold text-health-purple">{dataUsage.sleepLogs}</p>
-              <p className="text-sm text-muted-foreground">Sleep Logs</p>
-            </div>
-          </div>
-          <div className="mt-4 p-3 bg-muted rounded-lg">
-            <div className="flex justify-between items-center">
-              <span>Storage Used: {dataUsage.storageUsed}</span>
-              <Badge variant="outline">Last Backup: {dataUsage.lastBackup}</Badge>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Export Options */}
-      <Card className="health-card">
+    <div className="space-y-6">
+      <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Download className="h-5 w-5" />
-            Export Data
+            Data Export
           </CardTitle>
         </CardHeader>
-        <CardContent className="space-y-4">
-          {exportOptions.map((option, index) => (
-            <div key={index} className="flex items-center justify-between p-4 bg-muted rounded-lg">
-              <div className="flex items-center gap-3">
-                <option.icon className="h-8 w-8 text-health-blue" />
-                <div>
-                  <h4 className="font-medium">{option.type}</h4>
-                  <p className="text-sm text-muted-foreground">{option.description}</p>
-                  <Badge variant="outline" className="mt-1">
-                    {option.size} • {option.format}
-                  </Badge>
-                </div>
+        <CardContent>
+          <p className="text-muted-foreground mb-6">
+            Export your health data in various formats for backup or analysis.
+          </p>
+          
+          <div className="space-y-6">
+            <div>
+              <h3 className="font-medium mb-3">Export Format</h3>
+              <div className="space-y-3">
+                {exportOptions.map((option) => (
+                  <div key={option.format} className="border rounded-lg p-4">
+                    <div className="flex items-center gap-3 mb-2">
+                      <option.icon className="h-5 w-5" />
+                      <span className="font-medium">{option.format}</span>
+                    </div>
+                    <p className="text-sm text-muted-foreground mb-3">
+                      {option.description}
+                    </p>
+                    <div className="flex flex-wrap gap-2">
+                      {timePeriods.map((period) => (
+                        <Button
+                          key={period.value}
+                          size="sm"
+                          variant="outline"
+                          onClick={() => handleExport(option.format, period.label)}
+                        >
+                          {period.label}
+                        </Button>
+                      ))}
+                    </div>
+                  </div>
+                ))}
               </div>
-              <Button 
-                onClick={() => handleExport(option.type)}
-                className="bg-health-gradient"
-              >
-                <Download className="h-4 w-4 mr-2" />
-                Export
-              </Button>
             </div>
-          ))}
-        </CardContent>
-      </Card>
 
-      {/* App Settings */}
-      <Card className="health-card">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Settings className="h-5 w-5" />
-            App Settings
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="flex items-center justify-between p-3 bg-muted rounded-lg">
-            <div>
-              <h4 className="font-medium">Auto Cloud Backup</h4>
-              <p className="text-sm text-muted-foreground">Automatically backup data to cloud</p>
+            <div className="border-t pt-6">
+              <h3 className="font-medium mb-3">Quick Export</h3>
+              <div className="grid grid-cols-2 gap-4">
+                <Button
+                  onClick={() => handleExport('PDF', 'monthly')}
+                  className="flex items-center gap-2"
+                >
+                  <Calendar className="h-4 w-4" />
+                  Monthly Report
+                </Button>
+                <Button
+                  variant="outline"
+                  onClick={() => handleExport('CSV', 'all')}
+                  className="flex items-center gap-2"
+                >
+                  <FileSpreadsheet className="h-4 w-4" />
+                  All Data (CSV)
+                </Button>
+              </div>
             </div>
-            <Switch checked={autoBackup} onCheckedChange={setAutoBackup} />
-          </div>
-
-          <div className="flex items-center justify-between p-3 bg-muted rounded-lg">
-            <div>
-              <h4 className="font-medium">Push Notifications</h4>
-              <p className="text-sm text-muted-foreground">Receive reminders and updates</p>
-            </div>
-            <Switch checked={notificationsEnabled} onCheckedChange={setNotificationsEnabled} />
-          </div>
-
-          <div className="flex items-center justify-between p-3 bg-muted rounded-lg">
-            <div>
-              <h4 className="font-medium">Dark Mode</h4>
-              <p className="text-sm text-muted-foreground">Use dark theme</p>
-            </div>
-            <Switch checked={darkMode} onCheckedChange={setDarkMode} />
           </div>
         </CardContent>
       </Card>
 
-      {/* Backup & Restore */}
-      <Card className="health-card">
+      <Card>
         <CardHeader>
-          <CardTitle>Backup & Restore</CardTitle>
+          <CardTitle>Data Privacy</CardTitle>
         </CardHeader>
-        <CardContent className="space-y-4">
-          <Button onClick={handleCloudBackup} className="w-full bg-health-gradient">
-            <Database className="h-4 w-4 mr-2" />
-            Backup to Cloud
-          </Button>
-          
-          <Button variant="outline" className="w-full">
-            <Download className="h-4 w-4 mr-2" />
-            Restore from Backup
-          </Button>
-          
-          <Button onClick={handleClearData} variant="destructive" className="w-full">
-            <Trash2 className="h-4 w-4 mr-2" />
-            Clear All Data
-          </Button>
+        <CardContent>
+          <p className="text-sm text-muted-foreground">
+            Your exported data includes personal health information. Please handle it securely and only share it with trusted healthcare providers or applications.
+          </p>
         </CardContent>
       </Card>
     </div>

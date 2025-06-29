@@ -1,222 +1,174 @@
 
-import { useState, useEffect } from "react";
-import { Bell, BellOff, Clock, Target, Droplets, Utensils } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Switch } from "@/components/ui/switch";
-import { Badge } from "@/components/ui/badge";
-import { useToast } from "@/hooks/use-toast";
+import React, { useState } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Switch } from '@/components/ui/switch';
+import { Bell, Clock, Target, Droplets, Moon } from 'lucide-react';
 
 const NotificationCenter = () => {
-  const { toast } = useToast();
-  const [notifications, setNotifications] = useState([]);
-  const [notificationSettings, setNotificationSettings] = useState({
-    mealReminders: true,
-    waterReminders: true,
-    sleepReminders: true,
-    goalReminders: true,
-    achievements: true
-  });
-
-  const mockNotifications = [
+  const [notifications, setNotifications] = useState([
     {
       id: 1,
-      type: "meal",
-      title: "Lunch Time!",
-      message: "Don't forget to log your lunch",
-      time: "12:00 PM",
-      read: false,
-      icon: Utensils
+      type: 'reminder',
+      title: 'Time to log your weight!',
+      message: 'You haven\'t logged your weight today.',
+      time: '2 hours ago',
+      icon: Target,
+      read: false
     },
     {
       id: 2,
-      type: "water",
-      title: "Stay Hydrated",
-      message: "Time for another glass of water",
-      time: "2:30 PM",
-      read: false,
-      icon: Droplets
+      type: 'achievement',
+      title: 'Goal achieved!',
+      message: 'You\'ve reached your daily step goal of 10,000 steps!',
+      time: '5 hours ago',
+      icon: Target,
+      read: false
     },
     {
       id: 3,
-      type: "achievement",
-      title: "Goal Achieved!",
-      message: "You've reached your daily step goal",
-      time: "6:45 PM",
-      read: true,
-      icon: Target
-    },
-    {
-      id: 4,
-      type: "sleep",
-      title: "Bedtime Reminder",
-      message: "Time to wind down for better sleep",
-      time: "10:00 PM",
-      read: false,
-      icon: Clock
-    }
-  ];
-
-  const reminderTypes = [
-    {
-      key: "mealReminders",
-      title: "Meal Reminders",
-      description: "Breakfast, lunch, dinner logging",
-      icon: Utensils,
-      times: ["8:00 AM", "12:00 PM", "7:00 PM"]
-    },
-    {
-      key: "waterReminders",
-      title: "Water Reminders",
-      description: "Hydration throughout the day",
+      type: 'reminder',
+      title: 'Hydration reminder',
+      message: 'Remember to drink water!',
+      time: '1 day ago',
       icon: Droplets,
-      times: ["Every 2 hours"]
-    },
-    {
-      key: "sleepReminders",
-      title: "Sleep Reminders",
-      description: "Bedtime and wake up alerts",
-      icon: Clock,
-      times: ["10:00 PM", "7:00 AM"]
-    },
-    {
-      key: "goalReminders",
-      title: "Goal Check-ins",
-      description: "Daily progress reminders",
-      icon: Target,
-      times: ["6:00 PM"]
+      read: true
     }
-  ];
+  ]);
 
-  const handleToggleNotification = (key: string) => {
-    setNotificationSettings(prev => ({
-      ...prev,
-      [key]: !prev[key]
-    }));
-    
-    toast({
-      title: "Settings Updated",
-      description: `${key} notifications ${!notificationSettings[key] ? 'enabled' : 'disabled'}`,
-    });
+  const [settings, setSettings] = useState({
+    weightReminders: true,
+    mealReminders: true,
+    waterReminders: true,
+    sleepReminders: true,
+    goalAlerts: true
+  });
+
+  const markAsRead = (id: number) => {
+    setNotifications(prev => 
+      prev.map(notif => 
+        notif.id === id ? { ...notif, read: true } : notif
+      )
+    );
   };
 
-  const sendTestNotification = () => {
-    if ("Notification" in window) {
-      Notification.requestPermission().then(permission => {
-        if (permission === "granted") {
-          new Notification("TrackYou", {
-            body: "This is a test notification from TrackYou!",
-            icon: "/favicon.ico"
-          });
-          toast({
-            title: "Test Notification Sent",
-            description: "Check your device notifications",
-          });
-        }
-      });
-    }
+  const toggleSetting = (key: keyof typeof settings) => {
+    setSettings(prev => ({ ...prev, [key]: !prev[key] }));
   };
-
-  const unreadCount = mockNotifications.filter(n => !n.read).length;
 
   return (
-    <div className="space-y-6 animate-fade-in">
-      <div className="text-center space-y-2">
-        <h2 className="text-2xl font-bold gradient-text">Notifications</h2>
-        <p className="text-muted-foreground">Manage your reminders and alerts</p>
-      </div>
-
-      {/* Notification Summary */}
-      <Card className="health-card">
-        <CardContent className="p-6">
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-3">
-              <Bell className="h-8 w-8 text-health-blue" />
-              <div>
-                <h3 className="font-bold text-lg">Notification Center</h3>
-                <p className="text-muted-foreground">
-                  {unreadCount} unread notifications
-                </p>
-              </div>
-            </div>
-            <Badge variant="outline" className="text-health-blue">
-              {unreadCount} new
-            </Badge>
-          </div>
-          
-          <Button onClick={sendTestNotification} variant="outline" className="w-full">
-            <Bell className="h-4 w-4 mr-2" />
-            Send Test Notification
-          </Button>
-        </CardContent>
-      </Card>
-
-      {/* Recent Notifications */}
-      <Card className="health-card">
+    <div className="space-y-6">
+      <Card>
         <CardHeader>
-          <CardTitle>Recent Notifications</CardTitle>
+          <CardTitle className="flex items-center gap-2">
+            <Bell className="h-5 w-5" />
+            Notifications
+          </CardTitle>
         </CardHeader>
-        <CardContent className="space-y-3">
-          {mockNotifications.map((notification) => (
-            <div 
-              key={notification.id} 
-              className={`flex items-center gap-3 p-3 rounded-lg ${
-                notification.read ? 'bg-muted/50' : 'bg-health-gradient/10 border-l-4 border-health-blue'
-              }`}
-            >
-              <notification.icon className="h-6 w-6 text-health-blue" />
-              <div className="flex-1">
-                <h4 className="font-medium">{notification.title}</h4>
-                <p className="text-sm text-muted-foreground">{notification.message}</p>
-              </div>
-              <div className="text-right">
-                <p className="text-xs text-muted-foreground">{notification.time}</p>
-                {!notification.read && (
-                  <Badge variant="secondary" className="mt-1">New</Badge>
-                )}
-              </div>
-            </div>
-          ))}
-        </CardContent>
-      </Card>
-
-      {/* Notification Settings */}
-      <Card className="health-card">
-        <CardHeader>
-          <CardTitle>Reminder Settings</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          {reminderTypes.map((reminder) => (
-            <div key={reminder.key} className="flex items-center justify-between p-4 bg-muted rounded-lg">
-              <div className="flex items-center gap-3">
-                <reminder.icon className="h-6 w-6 text-health-blue" />
-                <div>
-                  <h4 className="font-medium">{reminder.title}</h4>
-                  <p className="text-sm text-muted-foreground">{reminder.description}</p>
-                  <div className="flex gap-1 mt-1">
-                    {reminder.times.map((time, index) => (
-                      <Badge key={index} variant="outline" className="text-xs">
-                        {time}
-                      </Badge>
-                    ))}
+        <CardContent>
+          {notifications.length === 0 ? (
+            <p className="text-muted-foreground">No notifications</p>
+          ) : (
+            <div className="space-y-3">
+              {notifications.map((notification) => (
+                <div
+                  key={notification.id}
+                  className={`p-3 border rounded-lg ${!notification.read ? 'bg-blue-50 border-blue-200' : ''}`}
+                >
+                  <div className="flex items-start gap-3">
+                    <notification.icon className="h-5 w-5 mt-0.5 text-muted-foreground" />
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 mb-1">
+                        <h4 className="font-medium">{notification.title}</h4>
+                        {!notification.read && <Badge variant="secondary" className="text-xs">New</Badge>}
+                      </div>
+                      <p className="text-sm text-muted-foreground mb-2">
+                        {notification.message}
+                      </p>
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs text-muted-foreground flex items-center gap-1">
+                          <Clock className="h-3 w-3" />
+                          {notification.time}
+                        </span>
+                        {!notification.read && (
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            onClick={() => markAsRead(notification.id)}
+                          >
+                            Mark as read
+                          </Button>
+                        )}
+                      </div>
+                    </div>
                   </div>
                 </div>
-              </div>
-              <Switch
-                checked={notificationSettings[reminder.key]}
-                onCheckedChange={() => handleToggleNotification(reminder.key)}
-              />
+              ))}
             </div>
-          ))}
+          )}
         </CardContent>
       </Card>
 
-      {/* Motivational Quotes */}
-      <Card className="health-card bg-health-gradient text-white">
-        <CardContent className="p-6 text-center">
-          <h3 className="font-bold text-lg mb-2">Daily Motivation</h3>
-          <p className="text-lg italic">"Success is the sum of small efforts repeated day in and day out."</p>
-          <p className="text-sm opacity-90 mt-2">- Robert Collier</p>
+      <Card>
+        <CardHeader>
+          <CardTitle>Notification Settings</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Target className="h-4 w-4" />
+              <span>Weight logging reminders</span>
+            </div>
+            <Switch
+              checked={settings.weightReminders}
+              onCheckedChange={() => toggleSetting('weightReminders')}
+            />
+          </div>
+          
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Bell className="h-4 w-4" />
+              <span>Meal logging reminders</span>
+            </div>
+            <Switch
+              checked={settings.mealReminders}
+              onCheckedChange={() => toggleSetting('mealReminders')}
+            />
+          </div>
+          
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Droplets className="h-4 w-4" />
+              <span>Water intake reminders</span>
+            </div>
+            <Switch
+              checked={settings.waterReminders}
+              onCheckedChange={() => toggleSetting('waterReminders')}
+            />
+          </div>
+          
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Moon className="h-4 w-4" />
+              <span>Sleep reminders</span>
+            </div>
+            <Switch
+              checked={settings.sleepReminders}
+              onCheckedChange={() => toggleSetting('sleepReminders')}
+            />
+          </div>
+          
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Target className="h-4 w-4" />
+              <span>Goal achievement alerts</span>
+            </div>
+            <Switch
+              checked={settings.goalAlerts}
+              onCheckedChange={() => toggleSetting('goalAlerts')}
+            />
+          </div>
         </CardContent>
       </Card>
     </div>
